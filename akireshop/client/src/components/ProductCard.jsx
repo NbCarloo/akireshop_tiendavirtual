@@ -3,6 +3,11 @@ import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import toast from 'react-hot-toast';
 import api from '../api';
+import SpotlightCard from './ui/SpotlightCard';
+
+function formatPrice(amount) {
+  return `₡${Math.round(amount).toLocaleString('en-US')}`;
+}
 
 export default function ProductCard({ product }) {
   const { user } = useAuth();
@@ -41,6 +46,7 @@ export default function ProductCard({ product }) {
 
   return (
     <Link to={`/product/${product.slug}`} className="group block">
+      <SpotlightCard className="overflow-hidden">
       <div className="relative overflow-hidden bg-gray-100 aspect-[3/4]">
         {image ? (
           <img
@@ -55,28 +61,25 @@ export default function ProductCard({ product }) {
         {/* Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-1">
           {product.tags?.includes('new-arrival') && (
-            <span className="badge bg-brand-500 text-white">New</span>
+            <span className="badge bg-gray-900 text-white">New</span>
           )}
           {isOnSale && (
             <span className="badge bg-black text-white">Sale</span>
           )}
-          {product.tags?.includes('trending') && (
-            <span className="badge bg-gray-900 text-white">Trending</span>
-          )}
         </div>
 
-        {/* Wishlist button */}
+        {/* Wishlist button — always visible */}
         <button
           onClick={handleWishlist}
-          className="absolute top-3 right-3 p-2 bg-white/80 hover:bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+          className="absolute top-3 right-3 p-1.5 bg-white/80 hover:bg-white rounded-full transition-colors"
           aria-label="Agregar a wishlist"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+          <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
           </svg>
         </button>
 
-        {/* Quick add */}
+        {/* Quick add — appears on hover */}
         <button
           onClick={handleQuickAdd}
           className="absolute bottom-0 inset-x-0 bg-gray-900 text-white text-xs font-medium tracking-wider uppercase py-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300"
@@ -86,20 +89,32 @@ export default function ProductCard({ product }) {
       </div>
 
       <div className="mt-3">
-        <p className="text-sm font-medium truncate">{product.name}</p>
+        <p className="text-sm font-medium text-gray-900 truncate">{product.name}</p>
         <div className="flex items-center gap-2 mt-1">
-          <span className="text-sm font-semibold">${price.toFixed(2)}</span>
+          <span className="text-sm font-semibold text-gray-900">{formatPrice(price)}</span>
           {isOnSale && (
-            <span className="text-xs text-gray-400 line-through">${product.price.toFixed(2)}</span>
+            <span className="text-xs text-gray-400 line-through">{formatPrice(product.price)}</span>
           )}
         </div>
-        {product.ratings?.count > 0 && (
-          <div className="flex items-center gap-1 mt-1">
-            <span className="text-yellow-400 text-xs">★</span>
-            <span className="text-xs text-gray-500">{product.ratings.average} ({product.ratings.count})</span>
+
+        {/* Color swatches */}
+        {product.colors?.length > 0 && (
+          <div className="flex items-center gap-1.5 mt-2">
+            {product.colors.slice(0, 4).map(c => (
+              <span
+                key={c.name}
+                className="w-3.5 h-3.5 rounded-full border border-gray-200 flex-shrink-0"
+                style={{ backgroundColor: c.hex || '#ccc' }}
+                title={c.name}
+              />
+            ))}
+            {product.colors.length > 4 && (
+              <span className="text-xs text-gray-400">+{product.colors.length - 4}</span>
+            )}
           </div>
         )}
       </div>
+      </SpotlightCard>
     </Link>
   );
 }
