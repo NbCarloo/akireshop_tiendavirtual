@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
 @layer base {
   html { scroll-behavior: smooth; }
   body { @apply font-sans text-gray-900 bg-white antialiased; }
@@ -63,13 +69,16 @@
   background-color: currentColor;
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform 0.3s ease;
+  transition: transform 0.25s var(--ease-out);
 }
 
 .nav-link:hover::after,
 .nav-link.active::after {
   transform: scaleX(1);
 }
+
+/* Suppress browser focus outlines on nav trigger */
+.contact-trigger, .contact-trigger * { outline: none !important; border: none !important; }
 
 /* Ripple animation */
 @keyframes ripple-expand {

@@ -1,5 +1,3 @@
-"use client"
-
 import { createContext, useContext, useEffect, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 
@@ -20,7 +18,7 @@ export function ExpandableScreen({
   layoutId = "expandable-card",
   triggerRadius = "100px",
   contentRadius = "24px",
-  animationDuration = 0.35,
+  animationDuration = 0.5,
   lockScroll = true,
 }) {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded)
@@ -56,9 +54,9 @@ export function ExpandableScreenTrigger({ children, className = "" }) {
   return (
     <AnimatePresence initial={false}>
       {!isExpanded && (
-        <motion.div className={`inline-block relative ${className}`}>
+        <motion.div tabIndex={-1} style={{ outline: 'none' }} className={`inline-block relative ${className}`}>
           <motion.div
-            style={{ borderRadius: triggerRadius }}
+            style={{ borderRadius: triggerRadius, outline: 'none', border: 'none', background: 'transparent' }}
             layout
             layoutId={layoutId}
             className="absolute inset-0 transform-gpu will-change-transform"
@@ -70,6 +68,7 @@ export function ExpandableScreenTrigger({ children, className = "" }) {
             exit={{ opacity: 0, scale: 0.8 }}
             layout={false}
             onClick={expand}
+            style={{ outline: 'none' }}
             className="relative cursor-pointer"
           >
             {children}
@@ -92,17 +91,26 @@ export function ExpandableScreenContent({
     <AnimatePresence initial={false}>
       {isExpanded && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-2">
+          {/* Backdrop */}
+          <motion.div
+            className="absolute inset-0 bg-white/70 backdrop-blur-md"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: animationDuration, ease: [0.32, 0.72, 0, 1] }}
+          />
+
+          {/* Expanding panel */}
           <motion.div
             layoutId={layoutId}
             transition={{ duration: animationDuration, ease: [0.32, 0.72, 0, 1] }}
             style={{ borderRadius: contentRadius }}
-            layout
             className={`relative flex h-full w-full overflow-y-auto transform-gpu will-change-transform ${className}`}
           >
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.18, duration: 0.35 }}
+              transition={{ delay: animationDuration * 0.6, duration: 0.3 }}
               className="relative z-20 w-full"
             >
               {children}
@@ -112,10 +120,10 @@ export function ExpandableScreenContent({
               <motion.button
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.25 }}
+                transition={{ delay: animationDuration * 0.7, duration: 0.2 }}
                 onClick={collapse}
-                className={`absolute right-6 top-6 z-30 flex h-10 w-10 items-center justify-center rounded-full transition-colors ${
-                  closeButtonClassName || "bg-gray-100 hover:bg-gray-200 text-gray-900"
+                className={`absolute right-6 top-6 z-30 flex h-10 w-10 items-center justify-center transition-colors rounded-full ${
+                  closeButtonClassName || "text-white bg-transparent hover:bg-white/10"
                 }`}
                 aria-label="Cerrar"
               >
